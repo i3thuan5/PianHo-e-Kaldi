@@ -1,5 +1,4 @@
-FROM ubuntu:24.04
-LABEL maintainer="rick@scriptix.io"
+FROM ubuntu:24.04 AS base
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -15,7 +14,6 @@ RUN apt-get update && \
         git \
         subversion \
         python3 \
-        python3-is-python \
         zlib1g-dev \
         ca-certificates \
         gfortran \
@@ -25,13 +23,23 @@ RUN apt-get update && \
         vim && \
     rm -rf /var/lib/apt/lists/*
 
+FROM base AS compiled
+
 RUN git clone --depth 1 https://github.com/kaldi-asr/kaldi.git /opt/kaldi
-RUN    cd /opt/kaldi/src && \
+RUN cd /opt/kaldi/tools && \
+        make -j $(nproc --ignore=4) && \
+        ./extras/check_dependencies.sh
+RUN cd /opt/kaldi/src && \
        ./configure --shared
-Run    make depend -j $(nproc)
-Run    make -j $(nproc)
-Run    find /opt/kaldi -type f \( -name "*.o" -o -name "*.la" -o -name "*.a" \) -exec rm {} \; && \
-       find /opt/intel -type f -name "*.a" -exec rm {} \; && \
-       find /opt/intel -type f -regex '.*\(_mc.?\|_mic\|_thread\|_ilp64\)\.so' -exec rm {} \; && \
-       rm -rf /opt/kaldi/.git
+RUN cd /opt/kaldi/src && \
+        make depend -j $(nproc --ignore=4)
+RUN cd /opt/kaldi/src && \
+        make -j $(nproc --ignore=4)
+RUN    find /opt/kaldi -type f \( -name "*.o" -o -name "*.la" -o -name "*.a" \) -exec rm {} \;
+
+
+FROM base
+
+COPY --from=compiled /opt/kaldi /opt/kaldi
+
 WORKDIR /opt/kaldi/
