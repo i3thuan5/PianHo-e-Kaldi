@@ -15,26 +15,22 @@ RUN apt-get update && \
         git \
         subversion \
         python3 \
+        python3-is-python \
         zlib1g-dev \
         ca-certificates \
         gfortran \
+        intel-mkl \
         patch \
         ffmpeg \
         vim && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y python3-is-python \
-    intel-mkl
-
 RUN git clone --depth 1 https://github.com/kaldi-asr/kaldi.git /opt/kaldi
-RUN    cd /opt/kaldi/tools && \
-       ./extras/install_mkl.sh && \
-       make -j $(nproc) && \
-       cd /opt/kaldi/src && \
-       ./configure --shared && \
-       make depend -j $(nproc) && \
-       make -j $(nproc) && \
-       find /opt/kaldi -type f \( -name "*.o" -o -name "*.la" -o -name "*.a" \) -exec rm {} \; && \
+RUN    cd /opt/kaldi/src && \
+       ./configure --shared
+Run    make depend -j $(nproc)
+Run    make -j $(nproc)
+Run    find /opt/kaldi -type f \( -name "*.o" -o -name "*.la" -o -name "*.a" \) -exec rm {} \; && \
        find /opt/intel -type f -name "*.a" -exec rm {} \; && \
        find /opt/intel -type f -regex '.*\(_mc.?\|_mic\|_thread\|_ilp64\)\.so' -exec rm {} \; && \
        rm -rf /opt/kaldi/.git
