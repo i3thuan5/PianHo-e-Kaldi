@@ -2,6 +2,10 @@ FROM python:3.12-bookworm AS base
 
 ENV LANG C.UTF-8
 
+# For intel-mkl, https://packages.debian.org/bookworm/intel-mkl
+RUN sed '0,/Signed-By/s/Components: main/Components: main non-free non-free-firmware/g1' \
+    -i /etc/apt/sources.list.d/debian.sources
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         g++ \
