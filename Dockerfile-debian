@@ -1,0 +1,53 @@
+FROM python:3.12-bookworm AS base
+
+ENV LANG C.UTF-8
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        g++ \
+        make \
+        automake \
+        autoconf \
+        bzip2 \
+        unzip \
+        wget \
+        sox \
+        libtool \
+        git \
+        subversion \
+        zlib1g-dev \
+        ca-certificates \
+        gfortran \
+        intel-mkl \
+        patch \
+        ffmpeg \
+        vim && \
+    rm -rf /var/lib/apt/lists/*
+
+FROM base AS compiled
+
+RUN git clone --depth 1 \
+    https://github.com/i3thuan5/kaldi.git \
+    --branch 2021-before-openfst-1.7.6 \
+    /opt/kaldi
+RUN cd /opt/kaldi/tools && \
+        make -j $(nproc --ignore=4) && \
+        ./extras/check_dependencies.sh
+RUN cd /opt/kaldi/src && \
+       ./configure --shared
+RUN cd /opt/kaldi/src && \
+        make depend -j $(nproc --ignore=4)
+RUN cd /opt/kaldi/src && \
+        make -j $(nproc --ignore=4)
+RUN find /opt/kaldi -type f \( -name "*.o" -o -name "*.a" \) -delete
+
+WORKDIR /opt/kaldi/egs/formosa/s5
+RUN rm -rf RESULTS cmd.sh local run.sh  # 留conf, path.sh, steps, utils
+COPY cmd.sh /opt/kaldi/egs/formosa/s5/
+
+
+FROM base
+
+COPY --from=compiled /opt/kaldi /opt/kaldi
+
+WORKDIR /opt/kaldi/
