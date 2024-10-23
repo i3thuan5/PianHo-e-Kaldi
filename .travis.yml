@@ -1,0 +1,50 @@
+---
+os: linux
+dist: jammy
+language: python
+python:
+  - '3.10'
+before_install:
+  - pip install --upgrade pip setuptools
+branches:
+  only:
+    - main
+jobs:
+  include:
+    - name: Check YAML format
+      install:
+        - pip install tox
+      script:
+        - tox -e yamllint
+    - name: pymarkdown
+      install:
+        - pip install tox
+      script:
+        - tox -e pymarkdown
+    - name: flake8
+      install:
+        - pip install tox
+      script:
+        - tox -e flake8
+    - name: Check Bash format
+      install:
+        - pip install tox
+      script:
+        - tox -e shellcheck
+    - name: Test
+      service:
+        - docker
+      addons:
+        # For the `SONARQUBE_SCANNER_PARAMS` variable
+        sonarcloud:
+          token: ${SONAR_TOKEN}
+      install:
+        - pip install tox
+      script:
+        - tox -e test
+        - >
+          docker run --rm
+          -e SONARQUBE_SCANNER_PARAMS
+          -e SONAR_TOKEN="${SONAR_TOKEN}"
+          -v "`pwd`:/usr/src"
+          sonarsource/sonar-scanner-cli
