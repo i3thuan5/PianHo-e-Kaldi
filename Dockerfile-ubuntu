@@ -4,6 +4,10 @@ ENV LANG C.UTF-8
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        language-pack-en \
+        python3 \
+        python3-pip \
+        python-is-python3 \
         g++ \
         make \
         automake \
@@ -15,8 +19,6 @@ RUN apt-get update && \
         libtool \
         git \
         subversion \
-        python3 \
-        python3-pip \
         zlib1g-dev \
         ca-certificates \
         gfortran \
