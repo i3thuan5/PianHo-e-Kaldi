@@ -39,7 +39,7 @@ RUN cd /opt/kaldi/tools && \
         make -j $(nproc --ignore=4) && \
         ./extras/check_dependencies.sh
 RUN cd /opt/kaldi/src && \
-       ./configure --shared
+       ./configure --shared --use-cuda=yes
 RUN cd /opt/kaldi/src && \
         make depend -j $(nproc --ignore=4)
 RUN cd /opt/kaldi/src && \
@@ -49,6 +49,11 @@ RUN find /opt/kaldi -type f \( -name "*.o" -o -name "*.a" \) -delete
 WORKDIR /opt/kaldi/egs/formosa/s5
 RUN rm -rf RESULTS cmd.sh local run.sh  # 留conf, path.sh, steps, utils
 COPY s5/cmd.sh /opt/kaldi/egs/formosa/s5/
+
+
+FROM base
+
+RUN /opt/kaldi/src/nnet3bin/cuda-compiled
 
 
 FROM base
