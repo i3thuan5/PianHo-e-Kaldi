@@ -16,3 +16,8 @@ docker build --pull \
 	-f Dockerfile-ubuntu-cuda . \
 	-t ithuan/pianho-e-kaldi:ubuntu-cuda
 docker push ithuan/pianho-e-kaldi:ubuntu-cuda
+
+docker build --pull \
+	-f Dockerfile-ubuntu22.04-cuda . \
+	-t ithuan/pianho-e-kaldi:ubuntu22.04-cuda
+docker push ithuan/pianho-e-kaldi:ubuntu22.04-cuda
