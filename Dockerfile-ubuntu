@@ -39,7 +39,7 @@ RUN cd /opt/kaldi/tools && \
         make -j $(nproc --ignore=4) && \
         ./extras/check_dependencies.sh
 RUN cd /opt/kaldi/src && \
-       ./configure --shared
+       ./configure --shared --use-cuda=no
 RUN cd /opt/kaldi/src && \
         make depend -j $(nproc --ignore=4)
 RUN cd /opt/kaldi/src && \
