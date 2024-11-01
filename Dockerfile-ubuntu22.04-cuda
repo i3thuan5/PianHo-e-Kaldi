@@ -50,9 +50,6 @@ WORKDIR /opt/kaldi/egs/formosa/s5
 RUN rm -rf RESULTS cmd.sh local run.sh  # 留conf, path.sh, steps, utils
 COPY s5/cmd.sh /opt/kaldi/egs/formosa/s5/
 
-
-FROM base
-
 RUN /opt/kaldi/src/nnet3bin/cuda-compiled
 
 
