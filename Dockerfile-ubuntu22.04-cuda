@@ -33,7 +33,7 @@ FROM base AS compiled
 
 RUN git clone --depth 1 \
     https://github.com/i3thuan5/kaldi.git \
-    --branch 2021-before-openfst-1.7.6 \
+    --branch 2024-before-openfst-1.7.6 \
     /opt/kaldi
 RUN cd /opt/kaldi/tools && \
         make -j $(nproc --ignore=4) && \
