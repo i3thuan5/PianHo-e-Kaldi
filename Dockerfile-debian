@@ -22,23 +22,24 @@ RUN apt-get update && \
         zlib1g-dev \
         ca-certificates \
         gfortran \
-        intel-mkl \
         patch \
         ffmpeg \
-        vim && \
+        vim \
+        intel-mkl \
+        && \
     rm -rf /var/lib/apt/lists/*
 
 FROM base AS compiled
 
 RUN git clone --depth 1 \
     https://github.com/i3thuan5/kaldi.git \
-    --branch 2021-before-openfst-1.7.6 \
+    --branch 2024-before-openfst-1.7.6 \
     /opt/kaldi
 RUN cd /opt/kaldi/tools && \
         make -j $(nproc --ignore=4) && \
         ./extras/check_dependencies.sh
 RUN cd /opt/kaldi/src && \
-       ./configure --shared
+       ./configure --shared --use-cuda=no
 RUN cd /opt/kaldi/src && \
         make depend -j $(nproc --ignore=4)
 RUN cd /opt/kaldi/src && \

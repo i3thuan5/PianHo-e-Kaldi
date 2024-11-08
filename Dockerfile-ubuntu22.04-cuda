@@ -1,6 +1,6 @@
-FROM ubuntu:24.04 AS base
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04 AS base
 
-ENV LANG C.UTF-8
+ENV LANG C.utf8
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -25,8 +25,8 @@ RUN apt-get update && \
         patch \
         ffmpeg \
         vim \
-        intel-mkl \
         && \
+    yes | DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends intel-mkl && \
     rm -rf /var/lib/apt/lists/*
 
 FROM base AS compiled
@@ -39,7 +39,7 @@ RUN cd /opt/kaldi/tools && \
         make -j $(nproc --ignore=4) && \
         ./extras/check_dependencies.sh
 RUN cd /opt/kaldi/src && \
-       ./configure --shared --use-cuda=no
+       ./configure --shared --use-cuda=yes
 RUN cd /opt/kaldi/src && \
         make depend -j $(nproc --ignore=4)
 RUN cd /opt/kaldi/src && \
@@ -49,6 +49,8 @@ RUN find /opt/kaldi -type f \( -name "*.o" -o -name "*.a" \) -delete
 WORKDIR /opt/kaldi/egs/formosa/s5
 RUN rm -rf RESULTS cmd.sh local run.sh  # 留conf, path.sh, steps, utils
 COPY s5/cmd.sh /opt/kaldi/egs/formosa/s5/
+
+RUN /opt/kaldi/src/nnet3bin/cuda-compiled
 
 
 FROM base
