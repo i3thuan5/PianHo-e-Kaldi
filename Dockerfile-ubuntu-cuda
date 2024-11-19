@@ -1,5 +1,7 @@
 FROM nvidia/cuda:12.6.2-cudnn-devel-ubuntu24.04 AS base
 
+# https://github.com/i3thuan5/PianHo-e-Kaldi/issues/4 ài處理
+
 ENV LANG C.utf8
 
 RUN apt-get update && \
