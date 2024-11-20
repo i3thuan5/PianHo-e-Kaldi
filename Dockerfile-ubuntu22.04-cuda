@@ -3,6 +3,7 @@ FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04 AS base
 ENV LANG C.utf8
 
 RUN apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
     apt-get install -y --no-install-recommends \
         language-pack-en \
         python3 \
